@@ -57,15 +57,15 @@
     <main class="w-full max-w-2xl bg-surface/80 backdrop-blur-xl rounded-2xl shadow-float border border-white/60 p-8 sm:p-12 transition-all duration-300">
         
         <!-- Header Section -->
-        <header class="mb-10 text-center">
+        <header class="mb-8 text-center relative">
             <div class="inline-flex items-center justify-center p-3 bg-green-50 rounded-2xl mb-5 shadow-sm border border-green-100">
                 <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                 </svg>
             </div>
             <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 mb-3">Legal Outcome Predictor</h1>
-            <p class="text-zinc-500 text-base max-w-md mx-auto leading-relaxed">
-                Enter the case details below to predict the legal outcome classification using our machine learning model.
+            <p class="text-zinc-500 text-sm max-w-md mx-auto leading-relaxed">
+                Test our Logistic Regression (LR) model. Enter case details below or use our sample data to predict the legal classification (e.g., Cited, Distinguished).
             </p>
         </header>
 
@@ -74,44 +74,64 @@
             
             <!-- Case Title Input -->
             <div class="space-y-2 group">
-                <label for="caseTitle" class="block text-sm font-semibold text-zinc-700 tracking-wide">Case Title</label>
+                <label for="caseTitle" class="block text-sm font-semibold text-zinc-700 tracking-wide">Case Title <span class="text-zinc-400 font-normal">(Optional)</span></label>
                 <input 
                     type="text" 
                     id="caseTitle" 
                     placeholder="e.g. Smith v. Industrial Corp" 
                     class="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 shadow-sm group-hover:border-zinc-300"
-                    required
                 >
             </div>
 
-            <!-- Case Text Input -->
+            <!-- Case Text Input with File Upload -->
             <div class="space-y-2 group">
-                <label for="caseText" class="block text-sm font-semibold text-zinc-700 tracking-wide">Case Text</label>
+                <div class="flex justify-between items-end mb-1">
+                    <label for="caseText" class="block text-sm font-semibold text-zinc-700 tracking-wide">Case Text / Summary</label>
+                    
+                    <!-- File Upload Button -->
+                    <label for="fileUpload" class="cursor-pointer inline-flex items-center text-xs font-medium text-primary hover:text-primary-hover transition-colors duration-200">
+                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                        Upload .txt file
+                        <input type="file" id="fileUpload" accept=".txt" class="hidden" onchange="handleFileUpload(event)">
+                    </label>
+                </div>
+                
                 <textarea 
                     id="caseText" 
-                    placeholder="Enter the full text or summary of the legal ruling here..." 
+                    placeholder="Paste the full text or summary of the legal ruling here to test the model..." 
                     class="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 shadow-sm min-h-[160px] resize-y group-hover:border-zinc-300"
                     required
                 ></textarea>
             </div>
 
-            <!-- Example Buttons (Micro-interactions) -->
-            <div class="flex flex-wrap gap-3 pt-2">
+            <!-- Testing Actions (Examples & Clear) -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <div class="flex flex-wrap gap-2">
+                    <button 
+                        type="button" 
+                        onclick="loadExample('cited')" 
+                        class="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-colors duration-200 border border-zinc-200/60"
+                        title="Load a sample case that gets classified as Cited"
+                    >
+                        Test 'Cited'
+                    </button>
+                    <button 
+                        type="button" 
+                        onclick="loadExample('distinguished')" 
+                        class="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-colors duration-200 border border-zinc-200/60"
+                        title="Load a sample case that gets classified as Distinguished"
+                    >
+                        Test 'Distinguished'
+                    </button>
+                </div>
+                
                 <button 
                     type="button" 
-                    onclick="loadExample('cited')" 
-                    class="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-colors duration-200 border border-zinc-200/60"
+                    onclick="clearForm()" 
+                    class="inline-flex items-center text-xs font-medium px-3 py-1.5 text-zinc-400 hover:text-red-500 transition-colors duration-200"
                 >
-                    <svg class="w-3 h-3 mr-1.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Load 'Cited' Example
-                </button>
-                <button 
-                    type="button" 
-                    onclick="loadExample('distinguished')" 
-                    class="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-colors duration-200 border border-zinc-200/60"
-                >
-                    <svg class="w-3 h-3 mr-1.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Load 'Distinguished' Example
+                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Clear Form
                 </button>
             </div>
 
@@ -122,7 +142,7 @@
                     onclick="makePrediction()" 
                     class="w-full relative flex items-center justify-center px-6 py-4 bg-primary text-white font-semibold text-lg rounded-xl hover:bg-primary-hover active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow group overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                    <span id="btnText">Predict Outcome</span>
+                    <span id="btnText">Run Model Prediction</span>
                     <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden absolute" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -138,17 +158,27 @@
 
             <!-- Result Box -->
             <div id="resultBox" class="hidden mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-soft transition-all duration-300 transform translate-y-0 opacity-100">
-                <div class="p-6 sm:p-8">
-                    <p class="text-xs font-bold tracking-widest text-zinc-400 uppercase mb-2">Predicted Classification</p>
-                    <div class="flex items-center">
-                        <div class="w-2 h-10 bg-primary rounded-full mr-4"></div>
-                        <h2 id="predictionValue" class="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">-</h2>
+                <div class="p-6 sm:p-8 flex justify-between items-end">
+                    <div>
+                        <p class="text-xs font-bold tracking-widest text-zinc-400 uppercase mb-2">Model Prediction</p>
+                        <div class="flex items-center">
+                            <div class="w-2 h-10 bg-primary rounded-full mr-4"></div>
+                            <h2 id="predictionValue" class="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">-</h2>
+                        </div>
+                    </div>
+                    
+                    <!-- Confidence Score Ring -->
+                    <div id="confidenceBox" class="hidden text-right">
+                        <p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase mb-1">Confidence</p>
+                        <div class="inline-flex items-center justify-center bg-green-50 text-primary font-bold text-lg px-3 py-1.5 rounded-lg border border-green-100">
+                            <span id="confidenceValue">--%</span>
+                        </div>
                     </div>
                 </div>
                 <div class="bg-zinc-50 px-6 py-3 border-t border-zinc-100">
                     <p class="text-xs text-zinc-500 font-medium flex items-center">
-                        <svg class="w-3.5 h-3.5 mr-1.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Analysis complete
+                        <svg class="w-3.5 h-3.5 mr-1.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Logistic Regression analysis complete
                     </p>
                 </div>
             </div>
@@ -169,17 +199,52 @@
                 textInput.value = "The appellant relies heavily on the precedent established in Jones v. State. However, we find that case to be readily distinguishable from the present matter. Unlike the situation in Jones, the facts of the present case show no such intent. Therefore, the circumstances here are clearly distinguishable on their facts, and the prior ruling does not apply.";
             }
             
-            // Add a subtle highlight effect to show it was populated
-            [titleInput, textInput].forEach(el => {
+            triggerHighlight([titleInput, textInput]);
+            hideResults();
+        }
+
+        function clearForm() {
+            document.getElementById('caseTitle').value = "";
+            document.getElementById('caseText').value = "";
+            hideResults();
+        }
+
+        function triggerHighlight(elements) {
+            elements.forEach(el => {
                 el.classList.add('ring-2', 'ring-primary/20', 'border-primary');
                 setTimeout(() => {
                     el.classList.remove('ring-2', 'ring-primary/20', 'border-primary');
                 }, 400);
             });
+        }
 
-            // Hide previous results
+        function hideResults() {
             document.getElementById('resultBox').classList.add('hidden');
             document.getElementById('errorMsg').classList.add('hidden');
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const textInput = document.getElementById('caseText');
+                const titleInput = document.getElementById('caseTitle');
+                
+                textInput.value = e.target.result;
+                // Auto-fill title with filename (without extension) if empty
+                if (!titleInput.value) {
+                    titleInput.value = file.name.replace(/\.[^/.]+$/, "");
+                }
+                
+                triggerHighlight([textInput, titleInput]);
+                hideResults();
+            };
+            reader.readAsText(file);
+            
+            // Reset file input so the same file can be uploaded again if needed
+            event.target.value = '';
         }
 
         async function makePrediction() {
@@ -192,9 +257,11 @@
             const errorText = document.getElementById('errorText');
             const resultBox = document.getElementById('resultBox');
             const predictionValue = document.getElementById('predictionValue');
+            const confidenceBox = document.getElementById('confidenceBox');
+            const confidenceValue = document.getElementById('confidenceValue');
 
-            if (!title && !text) {
-                errorText.textContent = "Please provide at least some case text or a title.";
+            if (!text) {
+                errorText.textContent = "Please provide the case text to analyze.";
                 errorMsg.classList.remove('hidden');
                 return;
             }
@@ -225,6 +292,15 @@
                 
                 // Show result
                 predictionValue.textContent = data.prediction.toUpperCase();
+                
+                // Show confidence if available
+                if (data.confidence) {
+                    const pct = (data.confidence * 100).toFixed(1);
+                    confidenceValue.textContent = `${pct}%`;
+                    confidenceBox.classList.remove('hidden');
+                } else {
+                    confidenceBox.classList.add('hidden');
+                }
                 
                 // Animate result in
                 resultBox.classList.remove('hidden');
