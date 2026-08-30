@@ -6,13 +6,13 @@
     <title>Legal Outcome Predictor</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --surface: #1e293b;
-            --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: #334155;
+            --bg-color: #f4fdf8;
+            --surface: #ffffff;
+            --primary: #15803d;
+            --primary-hover: #166534;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --border: #bbf7d0;
             --success: #10b981;
             --error: #ef4444;
         }
@@ -45,7 +45,7 @@
             font-size: 1.875rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            color: #fff;
+            color: var(--text-main);
         }
 
         p.subtitle {
@@ -61,16 +61,16 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #cbd5e1;
-            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
         }
 
         input[type="text"],
         textarea {
             width: 100%;
             padding: 0.75rem 1rem;
-            background-color: #0f172a;
+            background-color: #f8fafc;
             border: 1px solid var(--border);
             border-radius: 8px;
             color: var(--text-main);
@@ -84,7 +84,7 @@
         textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2);
         }
 
         textarea {
@@ -123,7 +123,7 @@
             margin-top: 2rem;
             padding: 1.5rem;
             border-radius: 8px;
-            background-color: #0f172a;
+            background-color: #f4fdf8;
             border: 1px solid var(--border);
             display: none;
             animation: fadeIn 0.4s ease;
