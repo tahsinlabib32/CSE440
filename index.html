@@ -4,222 +4,210 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legal Outcome Predictor</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#15803d', // Dark green accent
+                        'primary-hover': '#166534',
+                        background: '#fafafa', // Soft white/zinc-50 base
+                        surface: '#ffffff',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'float': '0 10px 40px -10px rgba(0, 0, 0, 0.08)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --bg-color: #f4fdf8;
-            --surface: #ffffff;
-            --primary: #15803d;
-            --primary-hover: #166534;
-            --text-main: #1e293b;
-            --text-muted: #475569;
-            --border: #bbf7d0;
-            --success: #10b981;
-            --error: #ef4444;
-        }
-
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            background-color: var(--surface);
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 600px;
-            border: 1px solid var(--border);
-            margin: 20px;
-        }
-
-        h1 {
-            margin-top: 0;
-            font-size: 1.875rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text-main);
-        }
-
-        p.subtitle {
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-main);
-            font-size: 0.95rem;
-        }
-
-        input[type="text"],
-        textarea {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background-color: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-main);
-            font-family: inherit;
-            font-size: 1rem;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
-        }
-
-        input[type="text"]:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 150px;
-        }
-
-        button {
-            width: 100%;
-            padding: 0.875rem;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-        }
-
-        button:hover {
-            background-color: var(--primary-hover);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        button:disabled {
-            background-color: var(--border);
-            color: var(--text-muted);
-            cursor: not-allowed;
-        }
-
-        .result-box {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            border-radius: 8px;
-            background-color: #f4fdf8;
-            border: 1px solid var(--border);
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .result-box h3 {
-            margin-top: 0;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
-        }
-
-        .result-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 0;
-        }
-
-        .error {
-            color: var(--error);
-            font-size: 0.9rem;
-            margin-top: 1rem;
-            display: none;
+        /* Smooth scrolling and base styling */
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Subtle Mesh Gradient Background */
+        .mesh-bg {
+            background-color: #fafafa;
+            background-image: 
+                radial-gradient(at 10% 0%, hsla(142, 69%, 95%, 1) 0px, transparent 50%),
+                radial-gradient(at 90% 100%, hsla(142, 69%, 95%, 1) 0px, transparent 50%);
+            background-attachment: fixed;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Legal Case Predictor</h1>
-        <p class="subtitle">Enter the case details to predict the legal outcome (e.g. cited, distinguished).</p>
+<body class="mesh-bg text-zinc-900 min-h-screen flex items-center justify-center p-6 antialiased selection:bg-green-200 selection:text-green-900">
 
-        <div class="form-group">
-            <label for="caseTitle">Case Title</label>
-            <input type="text" id="caseTitle" placeholder="Enter the title of the case..." required>
+    <!-- Main Card Container -->
+    <main class="w-full max-w-2xl bg-surface/80 backdrop-blur-xl rounded-2xl shadow-float border border-white/60 p-8 sm:p-12 transition-all duration-300">
+        
+        <!-- Header Section -->
+        <header class="mb-10 text-center">
+            <div class="inline-flex items-center justify-center p-3 bg-green-50 rounded-2xl mb-5 shadow-sm border border-green-100">
+                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
+                </svg>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 mb-3">Legal Outcome Predictor</h1>
+            <p class="text-zinc-500 text-base max-w-md mx-auto leading-relaxed">
+                Enter the case details below to predict the legal outcome classification using our machine learning model.
+            </p>
+        </header>
+
+        <!-- Form Section -->
+        <div class="space-y-6">
+            
+            <!-- Case Title Input -->
+            <div class="space-y-2 group">
+                <label for="caseTitle" class="block text-sm font-semibold text-zinc-700 tracking-wide">Case Title</label>
+                <input 
+                    type="text" 
+                    id="caseTitle" 
+                    placeholder="e.g. Smith v. Industrial Corp" 
+                    class="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 shadow-sm group-hover:border-zinc-300"
+                    required
+                >
+            </div>
+
+            <!-- Case Text Input -->
+            <div class="space-y-2 group">
+                <label for="caseText" class="block text-sm font-semibold text-zinc-700 tracking-wide">Case Text</label>
+                <textarea 
+                    id="caseText" 
+                    placeholder="Enter the full text or summary of the legal ruling here..." 
+                    class="w-full px-4 py-3.5 bg-white border border-zinc-200 rounded-xl text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 shadow-sm min-h-[160px] resize-y group-hover:border-zinc-300"
+                    required
+                ></textarea>
+            </div>
+
+            <!-- Example Buttons (Micro-interactions) -->
+            <div class="flex flex-wrap gap-3 pt-2">
+                <button 
+                    type="button" 
+                    onclick="loadExample('cited')" 
+                    class="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-colors duration-200 border border-zinc-200/60"
+                >
+                    <svg class="w-3 h-3 mr-1.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Load 'Cited' Example
+                </button>
+                <button 
+                    type="button" 
+                    onclick="loadExample('distinguished')" 
+                    class="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-colors duration-200 border border-zinc-200/60"
+                >
+                    <svg class="w-3 h-3 mr-1.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Load 'Distinguished' Example
+                </button>
+            </div>
+
+            <!-- Primary CTA -->
+            <div class="pt-4">
+                <button 
+                    id="predictBtn" 
+                    onclick="makePrediction()" 
+                    class="w-full relative flex items-center justify-center px-6 py-4 bg-primary text-white font-semibold text-lg rounded-xl hover:bg-primary-hover active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow group overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                    <span id="btnText">Predict Outcome</span>
+                    <svg id="loadingSpinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden absolute" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMsg" class="hidden mt-4 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium flex items-start">
+                <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="errorText"></span>
+            </div>
+
+            <!-- Result Box -->
+            <div id="resultBox" class="hidden mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-soft transition-all duration-300 transform translate-y-0 opacity-100">
+                <div class="p-6 sm:p-8">
+                    <p class="text-xs font-bold tracking-widest text-zinc-400 uppercase mb-2">Predicted Classification</p>
+                    <div class="flex items-center">
+                        <div class="w-2 h-10 bg-primary rounded-full mr-4"></div>
+                        <h2 id="predictionValue" class="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">-</h2>
+                    </div>
+                </div>
+                <div class="bg-zinc-50 px-6 py-3 border-t border-zinc-100">
+                    <p class="text-xs text-zinc-500 font-medium flex items-center">
+                        <svg class="w-3.5 h-3.5 mr-1.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Analysis complete
+                    </p>
+                </div>
+            </div>
+            
         </div>
-
-        <div class="form-group">
-            <label for="caseText">Case Text</label>
-            <textarea id="caseText" placeholder="e.g. The court relies heavily on the precedent set in the previous ruling. We agree with the plaintiff's interpretation..." required></textarea>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
-            <button type="button" onclick="loadExample('cited')" style="background-color: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 0.5rem; font-size: 0.85rem;">Load 'Cited' Example</button>
-            <button type="button" onclick="loadExample('distinguished')" style="background-color: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 0.5rem; font-size: 0.85rem;">Load 'Distinguished' Example</button>
-        </div>
-
-        <button id="predictBtn" onclick="makePrediction()">Predict Outcome</button>
-        <div id="errorMsg" class="error"></div>
-
-        <div id="resultBox" class="result-box">
-            <h3>Predicted Outcome</h3>
-            <p id="predictionValue" class="result-value">-</p>
-        </div>
-    </div>
+    </main>
 
     <script>
         function loadExample(type) {
+            const titleInput = document.getElementById('caseTitle');
+            const textInput = document.getElementById('caseText');
+            
             if (type === 'cited') {
-                document.getElementById('caseTitle').value = "Smith v. Industrial Corp";
-                document.getElementById('caseText').value = "The court relies heavily on the precedent set in the previous ruling. We agree with the plaintiff's interpretation of the employment contract and cite the relevant statutes that uphold this binding agreement. The principles from the earlier judgment are directly applicable to the facts at hand.";
+                titleInput.value = "Smith v. Industrial Corp";
+                textInput.value = "The court relies heavily on the precedent set in the previous ruling. We agree with the plaintiff's interpretation of the employment contract and cite the relevant statutes that uphold this binding agreement. The principles from the earlier judgment are directly applicable to the facts at hand.";
             } else if (type === 'distinguished') {
-                document.getElementById('caseTitle').value = "State v. Doe";
-                document.getElementById('caseText').value = "The appellant relies heavily on the precedent established in Jones v. State. However, we find that case to be readily distinguishable from the present matter. Unlike the situation in Jones, the facts of the present case show no such intent. Therefore, the circumstances here are clearly distinguishable on their facts, and the prior ruling does not apply.";
+                titleInput.value = "State v. Doe";
+                textInput.value = "The appellant relies heavily on the precedent established in Jones v. State. However, we find that case to be readily distinguishable from the present matter. Unlike the situation in Jones, the facts of the present case show no such intent. Therefore, the circumstances here are clearly distinguishable on their facts, and the prior ruling does not apply.";
             }
-            // Clear previous results
-            document.getElementById('resultBox').style.display = 'none';
-            document.getElementById('errorMsg').style.display = 'none';
+            
+            // Add a subtle highlight effect to show it was populated
+            [titleInput, textInput].forEach(el => {
+                el.classList.add('ring-2', 'ring-primary/20', 'border-primary');
+                setTimeout(() => {
+                    el.classList.remove('ring-2', 'ring-primary/20', 'border-primary');
+                }, 400);
+            });
+
+            // Hide previous results
+            document.getElementById('resultBox').classList.add('hidden');
+            document.getElementById('errorMsg').classList.add('hidden');
         }
 
         async function makePrediction() {
             const title = document.getElementById('caseTitle').value.trim();
             const text = document.getElementById('caseText').value.trim();
             const btn = document.getElementById('predictBtn');
+            const btnText = document.getElementById('btnText');
+            const spinner = document.getElementById('loadingSpinner');
             const errorMsg = document.getElementById('errorMsg');
+            const errorText = document.getElementById('errorText');
             const resultBox = document.getElementById('resultBox');
             const predictionValue = document.getElementById('predictionValue');
 
             if (!title && !text) {
-                errorMsg.textContent = "Please provide at least some case text or a title.";
-                errorMsg.style.display = 'block';
+                errorText.textContent = "Please provide at least some case text or a title.";
+                errorMsg.classList.remove('hidden');
                 return;
             }
 
-            // UI Loading state
+            // Loading state
             btn.disabled = true;
-            btn.textContent = "Analyzing...";
-            errorMsg.style.display = 'none';
-            resultBox.style.display = 'none';
+            btnText.classList.add('opacity-0');
+            spinner.classList.remove('hidden');
+            errorMsg.classList.add('hidden');
+            
+            // Hide result with animation
+            resultBox.classList.add('opacity-0', 'translate-y-4');
+            setTimeout(() => resultBox.classList.add('hidden'), 300);
 
             try {
                 const response = await fetch('/api/predict', {
@@ -237,14 +225,21 @@
                 
                 // Show result
                 predictionValue.textContent = data.prediction.toUpperCase();
-                resultBox.style.display = 'block';
+                
+                // Animate result in
+                resultBox.classList.remove('hidden');
+                // Trigger reflow
+                void resultBox.offsetWidth;
+                resultBox.classList.remove('opacity-0', 'translate-y-4');
                 
             } catch (error) {
-                errorMsg.textContent = error.message;
-                errorMsg.style.display = 'block';
+                errorText.textContent = error.message;
+                errorMsg.classList.remove('hidden');
             } finally {
+                // Restore button
                 btn.disabled = false;
-                btn.textContent = "Predict Outcome";
+                btnText.classList.remove('opacity-0');
+                spinner.classList.add('hidden');
             }
         }
     </script>
