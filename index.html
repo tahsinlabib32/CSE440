@@ -106,22 +106,26 @@
 
             <!-- Testing Actions (Examples & Clear) -->
             <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap items-center gap-2">
+                    <select id="sampleSelect" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-zinc-100 text-zinc-600 border border-zinc-200/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200">
+                        <option value="" disabled selected>Select a test class...</option>
+                        <option value="affirmed">Affirmed</option>
+                        <option value="applied">Applied</option>
+                        <option value="approved">Approved</option>
+                        <option value="cited">Cited</option>
+                        <option value="considered">Considered</option>
+                        <option value="discussed">Discussed</option>
+                        <option value="distinguished">Distinguished</option>
+                        <option value="followed">Followed</option>
+                        <option value="referred to">Referred To</option>
+                        <option value="related">Related</option>
+                    </select>
                     <button 
                         type="button" 
-                        onclick="loadExample('cited')" 
-                        class="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-colors duration-200 border border-zinc-200/60"
-                        title="Load a sample case that gets classified as Cited"
+                        onclick="loadSelectedExample()" 
+                        class="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors duration-200 border border-primary/20"
                     >
-                        Test 'Cited'
-                    </button>
-                    <button 
-                        type="button" 
-                        onclick="loadExample('distinguished')" 
-                        class="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-colors duration-200 border border-zinc-200/60"
-                        title="Load a sample case that gets classified as Distinguished"
-                    >
-                        Test 'Distinguished'
+                        Load Sample
                     </button>
                 </div>
                 
@@ -187,17 +191,59 @@
     </main>
 
     <script>
-        function loadExample(type) {
+        const sampleData = {
+            "applied": {
+                "title": "Australian Broadcasting Corporation v O'Neill [2006] HCA 46",
+                "text": "recent decision of the High Court in Australian Broadcasting Corporation v O'Neill [2006] HCA 46 clarifies this issue. Gleeson CJ and Crennan J (at [19]), after referring to various cases dealing with the grant of interlocutory injunctions in cases of defamation, formulated the general principles governing the grant of such relief in the following terms: \"in all applications for an interlocutory injunction, a court will ask whether the plaintiff has shown that there is a serious question to be tried as to the plaintiff's entitlement to relief, has shown that the plaintiff is likely to suffer injury for which damages will not be an adequate remedy, and has shown that the balance of convenience favours the granting of an injunction.\""
+            },
+            "followed": {
+                "title": "Hexal Australia Pty Ltd v Roche Therapeutics Inc (2005) 66 IPR 325",
+                "text": "Hexal Australia Pty Ltd v Roche Therapeutics Inc (2005) 66 IPR 325, the likelihood of irreparable harm was regarded by Stone J as, indeed, a separate element that had to be established by an applicant for an interlocutory injunction. Her Honour cited the well-known passage from the judgment of Mason ACJ in Castlemaine Tooheys Ltd v South Australia [1986] HCA 58 ; (1986) 161 CLR 148 (at 153) as support for that proposition. Had it not been for the fact that there will be a speedy trial of this matter, which Stone J regarded as a relevant consideration in Hexal v Roche (at [78]), I might have been inclined to grant some, at least, of the orders sought by CSL. I will give the parties an opportunity to be heard in relation to the matter of costs. I certify that the preceding one hundred and se..."
+            },
+            "referred to": {
+                "title": "Appellant S395/2002 v Minister for Immigration and Multicultural Affairs",
+                "text": "am satisfied that the finding of the third Tribunal that the two appellants are not, and were not, homosexuals was not made in the exercise of honest fact finding, but was deliberately calculated to \"get around\" difficulties in the factual circumstances of the appellants' case, thrown up by the judgment of the High Court in Appellant S395/2002 v Minister for Immigration and Multicultural Affairs; Appellant S396/2002 v Minister for Immigration and Multicultural Affairs [2003] HCA 71 ; (2003) 216 CLR 473 ( Appellant S395/2002 ). The appellants are Bangladeshi nationals. They came to Australia, arriving on 19 February 1999. They sought protection visas on 4 March 1999, claiming that they were homosexuals who had lived together as a couple since 1994, and that they had been subjected to persec..."
+            },
+            "related": {
+                "title": "Hayes, in the matter of Estate Property Group Limited [2007] FCA 935 ",
+                "text": "On 15 June 2007 I made orders extending the convening period for the meeting of creditors required to be held under s 439A of the Corporations Act 2001 (Cth) (the Act) to midnight 23 July 2007 in relation to a number of companies, being the members of what is known as the Estate Property Group (the Group), together with some ancillary orders on the application of the administrators of the companies in the Group (the Administrators) ( Hayes, in the matter of Estate Property Group Limited (Administrators Appointed) [2007] FCA 935). In a related application concerning Australian Capital Reserve Limited (Administrators Appointed) (ACR), on 12 June 2007 orders were made extending the \"decision period\" provided for by s 441A(1)(b) of the Act to the last day of the convening period for a number o..."
+            },
+            "considered": {
+                "title": "Australian Securities and Investments Commission v Pegasus Leveraged Options Group Pty Ltd (2002) 41 ACSR 561",
+                "text": "In Australian Securities and Investments Commission v Pegasus Leveraged Options Group Pty Ltd (2002) 41 ACSR 561 at 574 (\" Pegasus \"), Davies AJ addressed the question whether the sole director of the company which promoted and operated a managed investment scheme should also be considered to be a person operating the scheme. His Honour said at [55]-[57]: \"The word 'operate' is an ordinary word of the English language and, in the context, should be given its meaning in ordinary parlance. The term is not used to refer to ownership or proprietorship but rather to the acts which constitute the management of or the carrying out of the activities which constitute the managed investment scheme. The Oxford English Dictionary gives these relevant meanings: 5. To effect or produce by action or the ..."
+            },
+            "discussed": {
+                "title": "Foster v Australian Competition and Consumer Commission [2006] FCAFC 21",
+                "text": "Most recently, in Foster v Australian Competition and Consumer Commission [2006] FCAFC 21 , a Full Court (comprising Ryan, Finn and Allsop JJ) noted the apparent tension between the view expressed by Lockhart and Gummow JJ in ICI . Their Honours said at [30]-[31]: \"His Honour's reference to terms having 'an operation outside the boundaries of s 80 ' is no more than a paraphrase of the actual words of the subsection 'such terms as the Court determines to be appropriate.' That paraphrase, we consider with respect, does not illuminate the amplitude which should be given, as a matter of construction, to the grant of power. In our view, a more helpful guide to resolving the question of construction is afforded by this observation, also from ICI v Trade Practices Commission , of Lockhart J (with..."
+            },
+            "distinguished": {
+                "title": "Patterson, Re; Ex parte Taylor (2001) 207 CLR 291",
+                "text": "The applicant submits that the question whether the Treasurer is satisfied that an acquisition is contrary to the national interest is a jurisdictional fact and that it is not made out if the matters the Treasurer took into account do not support a reasonable and rational conclusion to that effect. She referred to the reasons for judgment of Kirby J in Re Patterson; Ex parte Taylor (2001) 207 CLR 291, in particular at 504-505 [338]. The reasons of Kirby J do seem to support the submission advanced by the applicant, but I would not apply them in this case. None of the other Justices in Re Patterson; Ex parte Taylor (supra) took a similar approach. For example, Gaudron J, who did discuss the concept of national interest, decided the case on the basis that the Minister asked herself the wrong..."
+            },
+            "affirmed": {
+                "title": "SZJXC v the Minister for Immigration and Citizenship [2006] FMCA 545",
+                "text": "This is an appeal from a decision of the Federal Magistrates Court which dismissed an application for review of a decision of the Refugee Review Tribunal affirming a decision of a delegate of the Minister to refuse the appellant a protection visa. The nature of the appellant's protection visa application, the reasons of the Tribunal and the Federal Magistrate are set out in more detail in the Federal Magistrate's decision, SZJXC v the Minister for Immigration and Citizenship [2006] FMCA 545 , which is available on the internet. 2 The appellant is a citizen of the People's Republic of China and his claim to be a refugee rests on an alleged fear of persecution based on his involvement in the practice of Falun Gong. 3 In his protection visa application he claimed to have been a member of Falu..."
+            },
+            "approved": {
+                "title": "Riverstone Computer Services Pty Ltd v IBM Global Financing Australia Limited [2002] FCA 1608",
+                "text": "notion of a 'market in Australia' was recently referred to by Lindgren J in Australian Competition and Consumer Commission v Qantas Airways Limited [2008] FCA 1976 , where his Honour stated (at [33]-[34]): Although the notion of a \"market in Australia\" in s 4E has been referred to in two cases ( Riverstone Computer Services Pty Ltd v IBM Global Financing Australia Ltd [2002] FCA 1608 at [21] per Hill J and Auskay International Manufacturing &amp; Trade Pty Ltd v Qantas Airways Ltd (2008) ATPR 42-256 at [19] per Tracey J), the concept has not been the subject of extensive judicial consideration. In Riverstone , Hill J rejected the proposition that in order to be a \"market in Australia\" a market must be wholly within Australia. His Honour said (at [21]) that the fact that a market was global..."
+            },
+            "cited": {
+                "title": "Dais Studio Pty Ltd v Bullett Creative Pty Ltd [2008] FCA 42",
+                "text": "The general principles governing the exercise of the discretion to award indemnity costs after rejection by an unsuccessful party of a so called Calderbank letter were set out in the judgment of the Full Court in Black v Lipovac [1998] FCA 699 ; (1998) 217 ALR 386. In summary those principles are: 1. Mere refusal of a \"Calderbank offer\" does not itself warrant an order for indemnity costs. In this connection it may be noted that Jessup J in Dais Studio Pty Ltd v Bullet Creative Pty Ltd [2008] FCA 42 said that (at [6]): if the rejection of such an offer is to ground a claim for indemnity costs, it must be by reason of some circumstance other than that the offer happened to comply with the Calderbank principle. 2. To obtain an order for indemnity costs the offeror must show that the refusal to accept it was unreasonable. 3. The reasonableness of the conduct of the offeree is to be viewed in the light of the circumstances that existed when the offer was rejected."
+            }
+        };
+
+        function loadSelectedExample() {
+            const select = document.getElementById('sampleSelect');
+            const type = select.value;
+            if (!type || !sampleData[type]) return;
+            
             const titleInput = document.getElementById('caseTitle');
             const textInput = document.getElementById('caseText');
             
-            if (type === 'cited') {
-                titleInput.value = "Smith v. Industrial Corp";
-                textInput.value = "The court relies heavily on the precedent set in the previous ruling. We agree with the plaintiff's interpretation of the employment contract and cite the relevant statutes that uphold this binding agreement. The principles from the earlier judgment are directly applicable to the facts at hand.";
-            } else if (type === 'distinguished') {
-                titleInput.value = "State v. Doe";
-                textInput.value = "The appellant relies heavily on the precedent established in Jones v. State. However, we find that case to be readily distinguishable from the present matter. Unlike the situation in Jones, the facts of the present case show no such intent. Therefore, the circumstances here are clearly distinguishable on their facts, and the prior ruling does not apply.";
-            }
+            titleInput.value = sampleData[type].title;
+            textInput.value = sampleData[type].text;
             
             triggerHighlight([titleInput, textInput]);
             hideResults();
