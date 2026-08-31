@@ -24,10 +24,12 @@ except Exception as e:
 class PredictionRequest(BaseModel):
     case_title: str
     case_text: str
+    explain: bool = False
 
 class PredictionResponse(BaseModel):
     prediction: str
     confidence: float = None
+    explanation: list = None
 
 def clean_legal_text(text):
     text = str(text)
@@ -78,7 +80,25 @@ def predict(request: PredictionRequest):
             proba = model.predict_proba(features)[0]
             confidence = float(max(proba))
             
-        return PredictionResponse(prediction=prediction, confidence=confidence)
+        explanation = None
+        if request.explain and hasattr(model, "coef_"):
+            import numpy as np
+            # Get the index of the predicted class
+            class_idx = list(model.classes_).index(prediction)
+            
+            # Get the feature names
+            feature_names = vectorizer.get_feature_names_out()
+            
+            # Multiply input TF-IDF vector by coefficients for the predicted class
+            dense_features = features.toarray()[0]
+            class_coef = model.coef_[class_idx]
+            contributions = dense_features * class_coef
+            
+            # Get the indices of the top 10 positive contributions
+            top_indices = np.argsort(contributions)[-10:][::-1]
+            explanation = [{"word": str(feature_names[i]), "score": float(contributions[i])} for i in top_indices if contributions[i] > 0]
+            
+        return PredictionResponse(prediction=prediction, confidence=confidence, explanation=explanation)
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
