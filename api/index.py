@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import Optional
 import joblib
 import unicodedata
 import re
@@ -28,8 +29,8 @@ class PredictionRequest(BaseModel):
 
 class PredictionResponse(BaseModel):
     prediction: str
-    confidence: float = None
-    explanation: list = None
+    confidence: Optional[float] = None
+    explanation: Optional[list] = None
 
 def clean_legal_text(text):
     text = str(text)
