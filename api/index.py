@@ -41,6 +41,17 @@ def health_check():
         return {"status": "error", "message": "Models failed to load."}
     return {"status": "ok", "message": "API is running and models are loaded."}
 
+@app.get("/api/random")
+def get_random_sample():
+    import json, random
+    sample_path = os.path.join(BASE_DIR, "random_samples.json")
+    try:
+        with open(sample_path, "r", encoding="utf-8") as f:
+            samples = json.load(f)
+        return random.choice(samples)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Could not load random samples.")
+
 @app.post("/api/predict", response_model=PredictionResponse)
 def predict(request: PredictionRequest):
     if model is None or vectorizer is None:
