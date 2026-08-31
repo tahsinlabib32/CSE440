@@ -12,14 +12,17 @@ app = FastAPI()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "model.pkl")
+NB_MODEL_PATH = os.path.join(BASE_DIR, "nbmodel.pkl")
 VECTORIZER_PATH = os.path.join(BASE_DIR, "vectorizer.pkl")
 
 try:
     model = joblib.load(MODEL_PATH)
+    nb_model = joblib.load(NB_MODEL_PATH)
     vectorizer = joblib.load(VECTORIZER_PATH)
 except Exception as e:
     print(f"Error loading models: {e}")
     model = None
+    nb_model = None
     vectorizer = None
 
 class PredictionRequest(BaseModel):
@@ -27,10 +30,14 @@ class PredictionRequest(BaseModel):
     case_text: str
     explain: bool = False
 
-class PredictionResponse(BaseModel):
+class SingleModelResponse(BaseModel):
     prediction: str
     confidence: Optional[float] = None
     explanation: Optional[list] = None
+
+class PredictionResponse(BaseModel):
+    lr: SingleModelResponse
+    nb: SingleModelResponse
 
 def clean_legal_text(text):
     text = str(text)
@@ -40,7 +47,7 @@ def clean_legal_text(text):
 
 @app.get("/api/health")
 def health_check():
-    if model is None or vectorizer is None:
+    if model is None or nb_model is None or vectorizer is None:
         return {"status": "error", "message": "Models failed to load."}
     return {"status": "ok", "message": "API is running and models are loaded."}
 
@@ -57,49 +64,51 @@ def get_random_sample():
 
 @app.post("/api/predict", response_model=PredictionResponse)
 def predict(request: PredictionRequest):
-    if model is None or vectorizer is None:
-        raise HTTPException(status_code=500, detail="Model is not loaded.")
+    if model is None or nb_model is None or vectorizer is None:
+        raise HTTPException(status_code=500, detail="Models are not fully loaded.")
     
     try:
-        # Preprocess input exactly as done during training
         model_text = "TITLE: " + request.case_title + " TEXT: " + request.case_text
         cleaned_text = clean_legal_text(model_text)
         
-        # If the input is completely empty after cleaning
         if not cleaned_text:
             raise HTTPException(status_code=400, detail="Input text is empty after cleaning.")
 
-        # Vectorize
         features = vectorizer.transform([cleaned_text])
+        dense_features = features.toarray()[0]
+        feature_names = vectorizer.get_feature_names_out()
+        present_features_mask = dense_features > 0
         
-        # Predict
-        prediction = model.predict(features)[0]
+        import numpy as np
         
-        # Optional: get confidence/probabilities if available
-        confidence = None
-        if hasattr(model, "predict_proba"):
-            proba = model.predict_proba(features)[0]
-            confidence = float(max(proba))
+        def run_model(m, is_lr=False, is_nb=False):
+            pred = m.predict(features)[0]
+            conf = None
+            if hasattr(m, "predict_proba"):
+                conf = float(max(m.predict_proba(features)[0]))
+                
+            expl = None
+            if request.explain:
+                class_idx = list(m.classes_).index(pred)
+                
+                if is_lr and hasattr(m, "coef_"):
+                    class_coef = m.coef_[class_idx]
+                    contributions = dense_features * class_coef
+                    top_indices = np.argsort(contributions)[-10:][::-1]
+                    expl = [{"word": str(feature_names[i]), "score": float(contributions[i])} for i in top_indices if contributions[i] > 0]
+                    
+                elif is_nb and hasattr(m, "feature_log_prob_"):
+                    class_log_prob = m.feature_log_prob_[class_idx]
+                    masked_log_prob = np.where(present_features_mask, class_log_prob, -np.inf)
+                    top_indices = np.argsort(masked_log_prob)[-10:][::-1]
+                    expl = [{"word": str(feature_names[i]), "score": float(class_log_prob[i])} for i in top_indices if masked_log_prob[i] != -np.inf]
             
-        explanation = None
-        if request.explain and hasattr(model, "coef_"):
-            import numpy as np
-            # Get the index of the predicted class
-            class_idx = list(model.classes_).index(prediction)
-            
-            # Get the feature names
-            feature_names = vectorizer.get_feature_names_out()
-            
-            # Multiply input TF-IDF vector by coefficients for the predicted class
-            dense_features = features.toarray()[0]
-            class_coef = model.coef_[class_idx]
-            contributions = dense_features * class_coef
-            
-            # Get the indices of the top 10 positive contributions
-            top_indices = np.argsort(contributions)[-10:][::-1]
-            explanation = [{"word": str(feature_names[i]), "score": float(contributions[i])} for i in top_indices if contributions[i] > 0]
-            
-        return PredictionResponse(prediction=prediction, confidence=confidence, explanation=explanation)
+            return SingleModelResponse(prediction=pred, confidence=conf, explanation=expl)
+
+        lr_res = run_model(model, is_lr=True)
+        nb_res = run_model(nb_model, is_nb=True)
+        
+        return PredictionResponse(lr=lr_res, nb=nb_res)
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

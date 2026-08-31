@@ -188,38 +188,45 @@
                 <span id="errorText"></span>
             </div>
 
-            <!-- Result Box -->
-            <div id="resultBox" class="hidden mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-soft transition-all duration-300 transform translate-y-0 opacity-100">
-                <div class="p-6 sm:p-8 flex justify-between items-end">
-                    <div>
-                        <p class="text-xs font-bold tracking-widest text-zinc-400 uppercase mb-2">Model Prediction</p>
-                        <div class="flex items-center">
-                            <div class="w-2 h-10 bg-primary rounded-full mr-4"></div>
-                            <h2 id="predictionValue" class="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">-</h2>
-                        </div>
-                    </div>
+            <!-- Result Container for 2 Models -->
+            <div id="resultBox" class="hidden mt-6 transition-all duration-300 transform translate-y-0 opacity-100">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     
-                    <!-- Confidence Score Ring -->
-                    <div id="confidenceBox" class="hidden text-right">
-                        <p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase mb-1">Confidence</p>
-                        <div class="inline-flex items-center justify-center bg-green-50 text-primary font-bold text-lg px-3 py-1.5 rounded-lg border border-green-100">
-                            <span id="confidenceValue">--%</span>
+                    <!-- Logistic Regression Card -->
+                    <div class="flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-soft">
+                        <div class="p-4 sm:p-5 flex flex-col border-b border-zinc-100 relative">
+                            <span class="absolute top-0 right-0 bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wide">Live</span>
+                            <p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase mb-1">Logistic Regression</p>
+                            <h2 id="lrPrediction" class="text-xl font-extrabold text-zinc-900 tracking-tight">-</h2>
+                            <div id="lrConfidenceBox" class="hidden mt-2 self-start inline-flex items-center justify-center bg-green-50 text-primary font-bold text-xs px-2 py-1 rounded-md border border-green-100">
+                                <span id="lrConfidenceValue">--%</span>
+                            </div>
+                        </div>
+                        <!-- LR XAI -->
+                        <div id="lrExplanationBox" class="hidden p-4 bg-zinc-50/50">
+                            <p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase mb-2">Important Words</p>
+                            <div id="lrExplanationTags" class="flex flex-wrap gap-1 mb-3"></div>
+                            <div id="lrHighlightedText" class="text-xs text-zinc-700 leading-relaxed max-h-32 overflow-y-auto p-2.5 bg-white rounded-lg border border-zinc-200 shadow-sm"></div>
                         </div>
                     </div>
-                </div>
-                <div class="bg-zinc-50 px-6 py-3 border-t border-zinc-100 flex justify-between items-center">
-                    <p class="text-xs text-zinc-500 font-medium flex items-center">
-                        <svg class="w-3.5 h-3.5 mr-1.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Logistic Regression analysis complete
-                    </p>
-                </div>
-                
-                <!-- XAI Section inside result -->
-                <div id="explanationBox" class="hidden px-6 py-5 border-t border-zinc-100 bg-white">
-                    <p class="text-xs font-bold tracking-widest text-zinc-400 uppercase mb-3">Model Explanation (Top Words)</p>
-                    <div id="explanationTags" class="flex flex-wrap gap-2 mb-4"></div>
-                    <div id="highlightedText" class="text-sm text-zinc-700 leading-relaxed max-h-40 overflow-y-auto p-3 bg-zinc-50 rounded-lg border border-zinc-200">
+
+                    <!-- Naive Bayes Card -->
+                    <div class="flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-soft">
+                        <div class="p-4 sm:p-5 flex flex-col border-b border-zinc-100">
+                            <p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase mb-1">Naive Bayes</p>
+                            <h2 id="nbPrediction" class="text-xl font-extrabold text-zinc-900 tracking-tight">-</h2>
+                            <div id="nbConfidenceBox" class="hidden mt-2 self-start inline-flex items-center justify-center bg-green-50 text-primary font-bold text-xs px-2 py-1 rounded-md border border-green-100">
+                                <span id="nbConfidenceValue">--%</span>
+                            </div>
+                        </div>
+                        <!-- NB XAI -->
+                        <div id="nbExplanationBox" class="hidden p-4 bg-zinc-50/50">
+                            <p class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase mb-2">Important Words</p>
+                            <div id="nbExplanationTags" class="flex flex-wrap gap-1 mb-3"></div>
+                            <div id="nbHighlightedText" class="text-xs text-zinc-700 leading-relaxed max-h-32 overflow-y-auto p-2.5 bg-white rounded-lg border border-zinc-200 shadow-sm"></div>
+                        </div>
                     </div>
+
                 </div>
             </div>
             
@@ -465,9 +472,7 @@
             const errorMsg = document.getElementById('errorMsg');
             const errorText = document.getElementById('errorText');
             const resultBox = document.getElementById('resultBox');
-            const predictionValue = document.getElementById('predictionValue');
-            const confidenceBox = document.getElementById('confidenceBox');
-            const confidenceValue = document.getElementById('confidenceValue');
+            const explain = document.getElementById('explainToggle').checked;
 
             if (!text) {
                 errorText.textContent = "Please provide the case text to analyze.";
@@ -481,13 +486,12 @@
             spinner.classList.remove('hidden');
             errorMsg.classList.add('hidden');
             
-            const explain = document.getElementById('explainToggle').checked;
-            
             // Hide result with animation
             resultBox.classList.add('opacity-0', 'translate-y-4');
             setTimeout(() => {
                 resultBox.classList.add('hidden');
-                document.getElementById('explanationBox').classList.add('hidden');
+                document.getElementById('lrExplanationBox').classList.add('hidden');
+                document.getElementById('nbExplanationBox').classList.add('hidden');
             }, 300);
 
             try {
@@ -504,44 +508,51 @@
 
                 const data = await response.json();
                 
-                // Show result
-                predictionValue.textContent = data.prediction.toUpperCase();
-                
-                // Show confidence if available
-                if (data.confidence) {
-                    const pct = (data.confidence * 100).toFixed(1);
-                    confidenceValue.textContent = `${pct}%`;
-                    confidenceBox.classList.remove('hidden');
-                } else {
-                    confidenceBox.classList.add('hidden');
+                function applyModelResult(prefix, resData) {
+                    // Update Prediction Text
+                    document.getElementById(prefix + 'Prediction').textContent = resData.prediction.toUpperCase();
+                    
+                    // Update Confidence
+                    const confBox = document.getElementById(prefix + 'ConfidenceBox');
+                    if (resData.confidence && confBox) {
+                        document.getElementById(prefix + 'ConfidenceValue').textContent = (resData.confidence * 100).toFixed(1) + '%';
+                        confBox.classList.remove('hidden');
+                    } else if (confBox) {
+                        confBox.classList.add('hidden');
+                    }
+                    
+                    // Update Explanation if applicable (LR and NB)
+                    const explBox = document.getElementById(prefix + 'ExplanationBox');
+                    if (explBox) {
+                        if (resData.explanation && resData.explanation.length > 0) {
+                            const tagsDiv = document.getElementById(prefix + 'ExplanationTags');
+                            const textDiv = document.getElementById(prefix + 'HighlightedText');
+                            tagsDiv.innerHTML = '';
+                            
+                            let highlighted = text;
+                            resData.explanation.forEach(item => {
+                                const span = document.createElement('span');
+                                span.className = "px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded border border-green-200 whitespace-nowrap";
+                                span.textContent = `${item.word} (${item.score > 0 ? '+' : ''}${item.score.toFixed(2)})`;
+                                tagsDiv.appendChild(span);
+                                
+                                try {
+                                    const regex = new RegExp(`\\b(${item.word})\\b`, 'gi');
+                                    highlighted = highlighted.replace(regex, '<mark class="bg-green-200 text-green-900 rounded px-0.5">$1</mark>');
+                                } catch(e) {}
+                            });
+                            
+                            textDiv.innerHTML = highlighted;
+                            explBox.classList.remove('hidden');
+                        } else {
+                            explBox.classList.add('hidden');
+                        }
+                    }
                 }
-                
-                // Handle XAI Explanation
-                const explanationBox = document.getElementById('explanationBox');
-                if (data.explanation && data.explanation.length > 0) {
-                    const tagsDiv = document.getElementById('explanationTags');
-                    const textDiv = document.getElementById('highlightedText');
-                    tagsDiv.innerHTML = '';
-                    
-                    let highlighted = text; // original text
-                    
-                    data.explanation.forEach(item => {
-                        // Add tag
-                        const span = document.createElement('span');
-                        span.className = "px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded border border-green-200";
-                        span.textContent = `${item.word} (+${item.score.toFixed(3)})`;
-                        tagsDiv.appendChild(span);
-                        
-                        // Highlight in text (case insensitive, whole word)
-                        try {
-                            const regex = new RegExp(`\\b(${item.word})\\b`, 'gi');
-                            highlighted = highlighted.replace(regex, '<mark class="bg-green-200 text-green-900 rounded px-0.5">$1</mark>');
-                        } catch(e) {}
-                    });
-                    
-                    textDiv.innerHTML = highlighted;
-                    explanationBox.classList.remove('hidden');
-                }
+
+                // Apply for each model
+                applyModelResult('lr', data.lr);
+                applyModelResult('nb', data.nb);
                 
                 // Animate result in
                 resultBox.classList.remove('hidden');
